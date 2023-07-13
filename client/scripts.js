@@ -11,7 +11,7 @@ const startResearch = () => {
 
 const listenToSockEvents = () => {
     const converter = new showdown.Converter();
-    const socket = new WebSocket("ws://gpt-researcher.us-east-1.elasticbeanstalk.com:8000/ws");
+    const socket = new WebSocket("ws://gpt-researcher.us-east-1.elasticbeanstalk.com/ws");
 
     // Log when the WebSocket connection is opened
     socket.onopen = (event) => {
