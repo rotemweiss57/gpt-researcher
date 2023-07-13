@@ -12,7 +12,25 @@ const startResearch = () => {
 const listenToSockEvents = () => {
     const converter = new showdown.Converter();
     const socket = new WebSocket("ws://localhost:8000/ws");
+
+    // Log when the WebSocket connection is opened
+    socket.onopen = (event) => {
+        console.log("WebSocket connection opened");
+
+        let task = document.querySelector('input[name="task"]').value;
+        let report_type = document.querySelector('select[name="report_type"]').value;
+        let agent = document.querySelector('input[name="agent"]:checked').value;
+        let data = "start " + JSON.stringify({task: task, report_type: report_type, agent: agent});
+
+        // Log the data being sent
+        console.log("Sending data:", data);
+        socket.send(data);
+    };
+
+    // Log when a message is received from the server
     socket.onmessage = (event) => {
+        console.log("Received data:", event.data);
+
         const data = JSON.parse(event.data);
         if (data.type === 'logs') {
             addAgentResponse(data);
@@ -22,14 +40,17 @@ const listenToSockEvents = () => {
             updateDownloadLink(data);
         }
     };
-    socket.onopen = (event) => {
-        let task = document.querySelector('input[name="task"]').value;
-        let report_type = document.querySelector('select[name="report_type"]').value;
-        let agent = document.querySelector('input[name="agent"]:checked').value;  // Corrected line
-        let data = "start " + JSON.stringify({task: task, report_type: report_type, agent: agent});
-        socket.send(data);
+
+    // Log any errors
+    socket.onerror = (error) => {
+        console.log("WebSocket error:", error);
     };
-}
+
+    // Log when the WebSocket connection is closed
+    socket.onclose = (event) => {
+        console.log("WebSocket connection closed");
+    };
+};
 
 const addAgentResponse = (data) => {
     const output = document.getElementById("output");

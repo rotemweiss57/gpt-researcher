@@ -16,6 +16,7 @@ class ResearchRequest(BaseModel):
 
 
 app = FastAPI()
+print("Starting server...")
 app.mount("/site", StaticFiles(directory="client"), name="site")
 app.mount("/static", StaticFiles(directory="client/static"), name="static")
 # Dynamic directory for outputs once first research is run
@@ -38,9 +39,11 @@ async def read_root(request: Request):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
+    print("Client connected")  # New log
     try:
         while True:
             data = await websocket.receive_text()
+            print(f"Received data: {data}")  # New log
             if data.startswith("start"):
                 json_data = json.loads(data[6:])
                 task = json_data.get("task")
@@ -52,6 +55,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     print("Error: not enough parameters provided.")
 
     except WebSocketDisconnect:
+        print("Client disconnected")  # New log
         await manager.disconnect(websocket)
 
 
