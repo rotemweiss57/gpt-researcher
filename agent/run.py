@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import openai
 
 from typing import List, Dict
 from fastapi import WebSocket
@@ -34,13 +35,14 @@ class WebSocketManager:
         del self.sender_tasks[websocket]
         del self.message_queues[websocket]
 
-    async def start_streaming(self, task, report_type, agent, websocket):
-        report, path = await run_agent(task, report_type, agent, websocket)
+    async def start_streaming(self, task, report_type, agent, websocket, api_key):
+        report, path = await run_agent(task, report_type, agent, websocket, api_key)
         return report, path
 
 
-async def run_agent(task, report_type, agent, websocket):
-    check_openai_api_key()
+async def run_agent(task, report_type, agent, websocket, api_key):
+
+    openai.api_key = api_key
 
     start_time = datetime.datetime.now()
 

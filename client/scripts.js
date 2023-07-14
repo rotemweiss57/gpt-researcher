@@ -12,6 +12,7 @@ const startResearch = () => {
 const listenToSockEvents = () => {
     const converter = new showdown.Converter();
     const socket = new WebSocket("ws://gpt-researcher-web.us-east-1.elasticbeanstalk.com/ws");
+    const keepAliveInterval = 30000; // 30 seconds
 
     // Log when the WebSocket connection is opened
     socket.onopen = (event) => {
@@ -20,11 +21,14 @@ const listenToSockEvents = () => {
         let task = document.querySelector('input[name="task"]').value;
         let report_type = document.querySelector('select[name="report_type"]').value;
         let agent = document.querySelector('input[name="agent"]:checked').value;
-        let data = "start " + JSON.stringify({task: task, report_type: report_type, agent: agent});
-
+        let api_key = document.querySelector('input[name="api_key"]').value; // Get the API key from the input field
+        let data = "start " + JSON.stringify({task: task, report_type: report_type, agent: agent, api_key: api_key}); // Include the API key in the data
         // Log the data being sent
         console.log("Sending data:", data);
         socket.send(data);
+        setInterval(() => {
+            socket.send("ping");
+        }, keepAliveInterval);
     };
 
     // Log when a message is received from the server
