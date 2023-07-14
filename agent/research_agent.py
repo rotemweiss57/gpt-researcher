@@ -131,13 +131,13 @@ class ResearchAgent:
         Returns: str: The research for the given question
         """
 
-        self.research_summary = read_txt_files(self.dir_path) if os.path.isdir(self.dir_path) else ""
+        #self.research_summary = read_txt_files(self.dir_path) if os.path.isdir(self.dir_path) else ""
 
-        if not self.research_summary:
-            search_queries = await self.create_search_queries()
-            for query in search_queries:
-                research_result = await self.run_search_summary(query)
-                self.research_summary += f"{research_result}\n\n"
+        #if not self.research_summary:
+        search_queries = await self.create_search_queries()
+        for query in search_queries:
+            research_result = await self.run_search_summary(query)
+            self.research_summary += f"{research_result}\n\n"
 
         await self.websocket.send_json(
             {"type": "logs", "output": f"Total research words: {len(self.research_summary.split(' '))}"})
