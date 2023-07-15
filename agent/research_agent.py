@@ -166,9 +166,9 @@ class ResearchAgent:
         answer = await self.call_agent(report_type_func(self.question, self.research_summary), stream=True,
                                        websocket=websocket)
 
-        path = await write_md_to_pdf(report_type, self.directory_name, await answer)
+        encoded_path, path = await write_md_to_pdf(report_type, self.directory_name, await answer)
 
-        return answer, path
+        return answer, encoded_path, path
 
     async def write_lessons(self):
         """ Writes lessons on essential concepts of the research.

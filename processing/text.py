@@ -144,7 +144,7 @@ async def write_md_to_pdf(task: str, directory_name: str, text: str) -> None:
 
     encoded_file_path = urllib.parse.quote(f"{file_path}.pdf")
 
-    return encoded_file_path
+    return encoded_file_path, f"{file_path}.pdf"
 
 def read_txt_files(directory):
     all_text = ''
@@ -161,5 +161,5 @@ def md_to_pdf(input_file, output_file):
     md2pdf(output_file,
            md_content=None,
            md_file_path=input_file,
-           css_file_path=None,
+           css_file_path="./processing/style.css",
            base_url=None)

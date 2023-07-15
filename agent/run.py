@@ -53,15 +53,15 @@ async def run_agent(task, report_type, agent, websocket, api_key):
     assistant = ResearchAgent(task, agent, websocket)
     await assistant.conduct_research()
 
-    report, path = await assistant.write_report(report_type, websocket)
-    await websocket.send_json({"type": "path", "output": path})
+    report, encoded_path, path = await assistant.write_report(report_type, websocket)
+    await websocket.send_json({"type": "path", "output": encoded_path})
 
     end_time = datetime.now()
     total_time = end_time - start_time
     await websocket.send_json({"type": "logs", "output": f"\nEnd time: {end_time}\n"})
     await websocket.send_json({"type": "logs", "output": f"\nTotal run time: {total_time}\n"})
 
-    path = upload_to_s3(path,"tavily-reports")
-    update_query(document_id, path, end_time, total_time)
+    url = upload_to_s3(path,"tavily-reports")
+    update_query(document_id, url, end_time, total_time)
 
     return report, path

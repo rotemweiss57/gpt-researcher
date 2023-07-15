@@ -83,7 +83,6 @@ s3 = boto3.client('s3')
 
 def upload_to_s3(file_path, bucket):
     file_name = file_path.split("/")[-1]  # get the filename from the path
-
     try:
         # Upload the file
         s3.upload_file(
