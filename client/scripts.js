@@ -11,7 +11,7 @@ const startResearch = () => {
 
 const listenToSockEvents = () => {
     const converter = new showdown.Converter();
-    const socket = new WebSocket("ws://gpt-researcher.us-east-1.elasticbeanstalk.com/ws");
+    const socket = new WebSocket("wss://app.tavily.com/ws");
     //const socket = new WebSocket("ws://localhost:8000/ws");
 
     const keepAliveInterval = 30000; // 30 seconds
