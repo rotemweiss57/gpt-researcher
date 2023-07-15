@@ -4,7 +4,6 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 import json
 import os
-from utils.utils import query2db
 
 from agent.run import WebSocketManager
 
@@ -44,7 +43,6 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-            print(f"Received data: {data}")  # New log
             if data.startswith("start"):
                 json_data = json.loads(data[6:])
                 task = json_data.get("task")
