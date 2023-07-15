@@ -10,6 +10,7 @@ python-dotenv~=1.0.0
 pyyaml==6.0
 selenium==4.10.0
 webdriver-manager==3.8.6
+boto3
 flask
 uvicorn
 pydantic

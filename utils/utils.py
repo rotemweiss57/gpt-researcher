@@ -1,6 +1,9 @@
 import os
 from pymongo import MongoClient
 from datetime import datetime, timedelta
+import boto3
+from botocore.exceptions import NoCredentialsError
+
 
 def query2db(query, agent, report_type, start_time):
     # Connect to the MongoDB server
@@ -71,3 +74,35 @@ def update_query(document_id, path, end_time, total_time):
 
     # Close the connection
     client.close()
+
+
+
+# Initialize the S3 client
+s3 = boto3.client('s3')
+
+
+def upload_to_s3(file_path, bucket):
+    file_name = file_path.split("/")[-1]  # get the filename from the path
+
+    try:
+        # Upload the file
+        s3.upload_file(
+            Filename=file_path,
+            Bucket=bucket,
+            Key=file_name,
+            ExtraArgs={
+                'ACL': 'public-read',  # this will make the file publicly readable
+                'ContentType': 'application/pdf'
+            }
+        )
+
+        print("Upload Successful")
+        return f"https://{bucket}.s3.amazonaws.com/{file_name}"
+
+    except FileNotFoundError:
+        print("The file was not found")
+        return None
+    except NoCredentialsError:
+        print("Credentials not available")
+        return None
+

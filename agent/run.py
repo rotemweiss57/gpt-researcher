@@ -4,8 +4,8 @@ import openai
 
 from typing import List, Dict
 from fastapi import WebSocket
-from utils.utils import query2db, update_query
-from config import check_openai_api_key
+from utils.utils import *
+#from config import check_openai_api_key
 from agent.research_agent import ResearchAgent
 
 
@@ -55,7 +55,6 @@ async def run_agent(task, report_type, agent, websocket, api_key):
     await assistant.conduct_research()
 
     report, path = await assistant.write_report(report_type, websocket)
-
     await websocket.send_json({"type": "path", "output": path})
 
     end_time = datetime.datetime.now()
@@ -63,6 +62,7 @@ async def run_agent(task, report_type, agent, websocket, api_key):
     await websocket.send_json({"type": "logs", "output": f"\nEnd time: {end_time}\n"})
     await websocket.send_json({"type": "logs", "output": f"\nTotal run time: {total_time}\n"})
 
+    path = upload_to_s3(path,"tavily-reports")
     update_query(document_id, path, end_time, total_time)
 
     return report, path
