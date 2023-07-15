@@ -4,6 +4,7 @@ import openai
 
 from typing import List, Dict
 from fastapi import WebSocket
+from utils.utils import query2db, update_query
 from config import check_openai_api_key
 from agent.research_agent import ResearchAgent
 
@@ -46,6 +47,8 @@ async def run_agent(task, report_type, agent, websocket, api_key):
 
     start_time = datetime.datetime.now()
 
+    document_id = query2db(task, agent, report_type, start_time)
+
     # await websocket.send_json({"type": "logs", "output": f"Start time: {str(start_time)}\n\n"})
 
     assistant = ResearchAgent(task, agent, websocket)
@@ -56,7 +59,10 @@ async def run_agent(task, report_type, agent, websocket, api_key):
     await websocket.send_json({"type": "path", "output": path})
 
     end_time = datetime.datetime.now()
+    total_time = end_time - start_time
     await websocket.send_json({"type": "logs", "output": f"\nEnd time: {end_time}\n"})
-    await websocket.send_json({"type": "logs", "output": f"\nTotal run time: {end_time - start_time}\n"})
+    await websocket.send_json({"type": "logs", "output": f"\nTotal run time: {total_time}\n"})
+
+    update_query(document_id, path, end_time, total_time)
 
     return report, path
