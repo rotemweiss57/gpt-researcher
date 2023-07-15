@@ -1,11 +1,6 @@
 import os
-
 from pymongo import MongoClient
-from datetime import datetime
-
-import os
-from pymongo import MongoClient
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def query2db(query, agent, report_type, start_time):
     # Connect to the MongoDB server
@@ -45,7 +40,11 @@ def query2db(query, agent, report_type, start_time):
     return document_id
 
 
+
 def update_query(document_id, path, end_time, total_time):
+    # Convert total_time to seconds
+    total_time_seconds = total_time.total_seconds()
+
     # Connect to the MongoDB server
     usr = os.getenv('MONGO_USER')
     pwd = os.getenv('MONGO_PWD')
@@ -61,7 +60,7 @@ def update_query(document_id, path, end_time, total_time):
     update_query = {
         '$set': {
             'end_time': end_time,
-            'total_time': total_time,
+            'total_time': total_time_seconds,
             'report_path': path,
             'status': 'finished'
         }
@@ -72,4 +71,3 @@ def update_query(document_id, path, end_time, total_time):
 
     # Close the connection
     client.close()
-
