@@ -16,3 +16,4 @@ pydantic
 fastapi
 python-multipart
 markdown
+pymongo
