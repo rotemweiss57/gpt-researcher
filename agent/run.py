@@ -1,7 +1,6 @@
 import asyncio
 import datetime
 import openai
-
 from typing import List, Dict
 from fastapi import WebSocket
 from utils.utils import *
@@ -45,7 +44,7 @@ async def run_agent(task, report_type, agent, websocket, api_key):
 
     openai.api_key = api_key
 
-    start_time = datetime.datetime.now()
+    start_time = datetime.now()
 
     document_id = query2db(task, agent, report_type, start_time)
 
@@ -57,7 +56,7 @@ async def run_agent(task, report_type, agent, websocket, api_key):
     report, path = await assistant.write_report(report_type, websocket)
     await websocket.send_json({"type": "path", "output": path})
 
-    end_time = datetime.datetime.now()
+    end_time = datetime.now()
     total_time = end_time - start_time
     await websocket.send_json({"type": "logs", "output": f"\nEnd time: {end_time}\n"})
     await websocket.send_json({"type": "logs", "output": f"\nTotal run time: {total_time}\n"})
