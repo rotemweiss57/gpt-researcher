@@ -6,7 +6,7 @@ import openai
 from typing import List, Dict
 from fastapi import WebSocket
 from utils.utils import *
-#from config import check_openai_api_key
+# from config import check_openai_api_key
 from agent.research_agent import ResearchAgent
 
 
@@ -43,17 +43,19 @@ class WebSocketManager:
 
 
 async def run_agent(task, report_type, agent, websocket, api_key):
-
     openai.api_key = api_key
 
     start_time = datetime.now()
 
-    document_id = query2db(task, agent, report_type, start_time)
-
     # await websocket.send_json({"type": "logs", "output": f"Start time: {str(start_time)}\n\n"})
 
     assistant = ResearchAgent(task, agent, websocket)
-    await assistant.conduct_research()
+    result, error = await assistant.conduct_research()
+    if result == "Error":
+        await websocket.send_json({"type": "logs", "output": error})
+        return None, None
+
+    document_id = query2db(task, agent, report_type, start_time)
 
     report, encoded_path, path = await assistant.write_report(report_type, websocket)
     await websocket.send_json({"type": "path", "output": encoded_path})
@@ -65,7 +67,7 @@ async def run_agent(task, report_type, agent, websocket, api_key):
 
     file_name = str(uuid.uuid4()) + '.pdf'
 
-    url = upload_to_s3(path,"tavily-reports", file_name)
+    url = upload_to_s3(path, "tavily-reports", file_name)
     update_query(document_id, url, end_time, total_time)
 
     return report, path
