@@ -56,16 +56,20 @@ async def run_agent(task, report_type, agent, websocket, api_key):
     await assistant.conduct_research()
 
     report, encoded_path, path = await assistant.write_report(report_type, websocket)
-    await websocket.send_json({"type": "path", "output": encoded_path})
-
-    end_time = datetime.now()
-    total_time = end_time - start_time
-    await websocket.send_json({"type": "logs", "output": f"\nEnd time: {end_time}\n"})
-    await websocket.send_json({"type": "logs", "output": f"\nTotal run time: {total_time}\n"})
-
+    
     file_name = str(uuid.uuid4()) + '.pdf'
 
     url = upload_to_s3(path,"tavily-reports", file_name)
     update_query(document_id, url, end_time, total_time)
+
+    
+    await websocket.send_json({"type": "path", "output": url})
+
+    end_time = datetime.now()
+    total_time = end_time - start_time
+    
+    await websocket.send_json({"type": "logs", "output": f"\nEnd time: {end_time}\n"})
+    await websocket.send_json({"type": "logs", "output": f"\nTotal run time: {total_time}\n"})
+    websocket.disconnect()
 
     return report, path
