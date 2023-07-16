@@ -81,8 +81,7 @@ def update_query(document_id, path, end_time, total_time):
 s3 = boto3.client('s3')
 
 
-def upload_to_s3(file_path, bucket):
-    file_name = file_path.split("/")[-1]  # get the filename from the path
+def upload_to_s3(file_path, bucket, file_name):
     try:
         # Upload the file
         s3.upload_file(

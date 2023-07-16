@@ -1,5 +1,7 @@
 import asyncio
 import datetime
+import uuid
+
 import openai
 from typing import List, Dict
 from fastapi import WebSocket
@@ -61,7 +63,9 @@ async def run_agent(task, report_type, agent, websocket, api_key):
     await websocket.send_json({"type": "logs", "output": f"\nEnd time: {end_time}\n"})
     await websocket.send_json({"type": "logs", "output": f"\nTotal run time: {total_time}\n"})
 
-    url = upload_to_s3(path,"tavily-reports")
+    file_name = str(uuid.uuid4()) + '.pdf'
+
+    url = upload_to_s3(path,"tavily-reports", file_name)
     update_query(document_id, url, end_time, total_time)
 
     return report, path
