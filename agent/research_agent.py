@@ -152,7 +152,7 @@ class ResearchAgent:
         await self.websocket.send_json(
             {"type": "logs", "output": f"Total research words: {len(self.research_summary.split(' '))}"})
 
-        return self.research_summary
+        return self.research_summary, None
 
     async def create_concepts(self):
         """ Creates the concepts for the given question.

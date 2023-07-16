@@ -46,17 +46,12 @@ async def run_agent(task, report_type, agent, websocket, api_key):
     openai.api_key = api_key
 
     start_time = datetime.now()
-
-    # await websocket.send_json({"type": "logs", "output": f"Start time: {str(start_time)}\n\n"})
-
+    document_id = query2db(task, agent, report_type, start_time)
     assistant = ResearchAgent(task, agent, websocket)
     result, error = await assistant.conduct_research()
     if result == "Error":
         await websocket.send_json({"type": "logs", "output": error})
         return None, None
-
-    document_id = query2db(task, agent, report_type, start_time)
-
     report, encoded_path, path = await assistant.write_report(report_type, websocket)
     await websocket.send_json({"type": "path", "output": encoded_path})
 
