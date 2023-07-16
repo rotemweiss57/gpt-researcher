@@ -90,7 +90,7 @@ class ResearchAgent:
             await self.websocket.send_json(
                 {"type": "logs", "output": f"🧠 I will conduct my research based on the following queries: {result}..."})
             result = json.loads(result)
-            return result
+            return result, None
         except Exception as e:
             return "Error", e
 
