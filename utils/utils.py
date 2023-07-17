@@ -44,7 +44,7 @@ def query2db(query, agent, report_type, start_time):
 
 
 
-def update_query(document_id, path, end_time, total_time):
+def update_query(document_id, path=None ,status=None, end_time=None, total_time=None, error=None):
     # Convert total_time to seconds
     total_time_seconds = total_time.total_seconds()
 
@@ -65,7 +65,9 @@ def update_query(document_id, path, end_time, total_time):
             'end_time': end_time,
             'total_time': total_time_seconds,
             'report_path': path,
-            'status': 'finished'
+            'status': status,
+            'error': error
+
         }
     }
 
