@@ -102,9 +102,11 @@ sudo chmod +x /usr/bin/chromedriver
 # Verify the installed ChromeDriver version
 chromedriver --version
 
-# Install Google Chrome
-sudo curl https://intoli.com/install-google-chrome.sh | bash
-sudo mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
+# Install Google Chrome version 114
+if ! type google-chrome > /dev/null 2>&1; then
+    sudo curl https://intoli.com/install-google-chrome.sh | bash -s -- --version "114.0"
+    sudo mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
+fi
 
 # Verify the installed Google Chrome version
 google-chrome --version && which google-chrome
