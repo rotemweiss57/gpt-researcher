@@ -91,12 +91,13 @@ sudo ldconfig /usr/lib
 cd /tmp/
 wget https://chromedriver.storage.googleapis.com/2.37/chromedriver_linux64.zip
 unzip -o chromedriver_linux64.zip
-sudo mv chromedriver /usr/bin/chromedriver
+sudo mv -f chromedriver /usr/bin/chromedriver
 chromedriver --version
 
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo dpkg -i google-chrome-stable_current_amd64.deb
 
-sudo mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
+sudo mv -f /usr/bin/google-chrome-stable /usr/bin/google-chrome
 google-chrome --version && which google-chrome
+
 
