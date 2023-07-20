@@ -5,7 +5,8 @@ import logging
 import asyncio
 from pathlib import Path
 from sys import platform
-
+from seleniumbase import Driver
+from seleniumbase import config as sb_config
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
@@ -19,6 +20,7 @@ from selenium.webdriver.safari.options import Options as SafariOptions
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from fastapi import WebSocket
+
 
 import processing.text as summary
 
@@ -109,7 +111,6 @@ def scrape_text_with_selenium(url: str) -> tuple[WebDriver, str]:
 
     options = ChromeOptions()
     options.add_argument("--headless")
-    options.binary_location = '/usr/bin/chromium-browser'
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")  # Overcomes limited resource problems
     options.add_argument(f'user-agent={CFG.user_agent}')
@@ -117,7 +118,7 @@ def scrape_text_with_selenium(url: str) -> tuple[WebDriver, str]:
 
     #service = Service(executable_path=ChromeDriverManager().install())
     #driver = webdriver.Chrome(service=service, options=options)
-    driver = webdriver.Chrome(options=options)
+    driver = Driver(browser="chrome", headless=False)
 
     driver.get(url)
 
