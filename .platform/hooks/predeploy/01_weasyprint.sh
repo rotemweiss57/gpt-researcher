@@ -89,9 +89,3 @@ fi
 sudo ldconfig /usr/lib
 
 
-cd /tmp/
-
-sudo curl https://intoli.com/install-google-chrome.sh | bash
-sudo mv -f /usr/bin/google-chrome-stable /usr/bin/google-chrome
-google-chrome --version && which google-chrome
-
