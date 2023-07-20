@@ -91,7 +91,7 @@ sudo ldconfig /usr/lib
 cd /tmp/
 
 # Specific version of ChromeDriver
-LATEST_CHROMEDRIVER_VERSION='114.0.5735.90'
+LATEST_CHROMEDRIVER_VERSION='80.0.3987.106'
 
 if ! type chromedriver > /dev/null 2>&1; then
     sudo wget "https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
