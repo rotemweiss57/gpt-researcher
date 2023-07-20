@@ -7,18 +7,15 @@ from pathlib import Path
 from sys import platform
 
 from bs4 import BeautifulSoup
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.firefox import GeckoDriverManager
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.safari.options import Options as SafariOptions
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from fastapi import WebSocket
+from webdriver_manager.firefox import GeckoDriverManager
 
 import processing.text as summary
 
@@ -31,7 +28,6 @@ executor = ThreadPoolExecutor()
 
 FILE_DIR = Path(__file__).parent.parent
 CFG = Config()
-
 
 async def async_browse(url: str, question: str, websocket: WebSocket) -> str:
     """Browse a website and return the answer and links to the user
@@ -107,15 +103,15 @@ def scrape_text_with_selenium(url: str) -> tuple[WebDriver, str]:
     """
     logging.getLogger("selenium").setLevel(logging.CRITICAL)
 
-    options = ChromeOptions()
+    options = FirefoxOptions()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")  # Overcomes limited resource problems
     options.add_argument(f'user-agent={CFG.user_agent}')
-    options.add_experimental_option("prefs", {"download_restrictions": 3})
+    # Firefox specific preferences for downloads can be added if necessary
 
-    service = Service(executable_path=ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
+    service = Service(executable_path=GeckoDriverManager().install())
+    driver = webdriver.Firefox(service=service, options=options)
 
     driver.get(url)
 
