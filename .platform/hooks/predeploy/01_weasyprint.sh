@@ -90,42 +90,23 @@ sudo ldconfig /usr/lib
 
 cd /tmp/
 
-# Specify the desired ChromeDriver version
-DESIRED_CHROMEDRIVER_VERSION='114.0.5735.90'
-DESIRED_GOOGLE_CHROME_VERSION='114'
+# Specific version of ChromeDriver
+LATEST_CHROMEDRIVER_VERSION='114.0.5735.90'
 
-# Install ChromeDriver
-echo "Installing ChromeDriver..."
-wget -N "https://chromedriver.storage.googleapis.com/${DESIRED_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -P ~/
-unzip ~/chromedriver_linux64.zip -d ~/
-rm ~/chromedriver_linux64.zip
-sudo mv -f ~/chromedriver /usr/bin/chromedriver
-sudo chown root:root /usr/bin/chromedriver
-sudo chmod 0755 /usr/bin/chromedriver
-
-# Verify the installed ChromeDriver version
-echo "Verifying ChromeDriver installation..."
-if chromedriver --version | grep "${DESIRED_CHROMEDRIVER_VERSION}"; then
-    echo "ChromeDriver installed successfully."
-else
-    echo "ChromeDriver installation failed."
-    exit 1
+if ! type chromedriver > /dev/null 2>&1; then
+    sudo wget "https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
+    sudo unzip chromedriver_linux64.zip
+    sudo mv chromedriver /usr/bin/chromedriver
+    sudo chmod +x /usr/bin/chromedriver
 fi
 
-# Install Google Chrome
-echo "Installing Google Chrome..."
+chromedriver --version
+
+# Install latest stable version of Google Chrome
 if ! type google-chrome > /dev/null 2>&1; then
-    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-    echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
-    sudo apt-get update
-    sudo apt-get install -y google-chrome-stable
+    sudo curl https://intoli.com/install-google-chrome.sh | bash
+    sudo mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
 fi
 
-# Verify the installed Google Chrome version
-echo "Verifying Google Chrome installation..."
-if google-chrome --version | grep "${DESIRED_GOOGLE_CHROME_VERSION}"; then
-    echo "Google Chrome installed successfully."
-else
-    echo "Google Chrome installation failed."
-    exit 1
-fi
+google-chrome --version && which google-chrome
+
