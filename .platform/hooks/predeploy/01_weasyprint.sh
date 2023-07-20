@@ -89,13 +89,8 @@ fi
 sudo ldconfig /usr/lib
 
 
-cd /tmp/
-sudo wget https://chromedriver.storage.googleapis.com/115.0.5790.98/chromedriver_linux64.zip
-sudo unzip -o chromedriver_linux64.zip
-sudo mv -f chromedriver /usr/bin/chromedriver
-chromedriver --version
+sudo yum install -y chromium
 
-sudo curl https://intoli.com/install-google-chrome.sh | bash
-sudo mv -f /usr/bin/google-chrome-stable /usr/bin/google-chrome
-google-chrome --version && which google-chrome
-
+CHROMEDRIVER_VERSION=2.38
+wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/

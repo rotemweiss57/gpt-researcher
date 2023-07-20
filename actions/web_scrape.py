@@ -109,13 +109,15 @@ def scrape_text_with_selenium(url: str) -> tuple[WebDriver, str]:
 
     options = ChromeOptions()
     options.add_argument("--headless")
+    options.binary_location = '/usr/bin/chromium-browser'
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")  # Overcomes limited resource problems
     options.add_argument(f'user-agent={CFG.user_agent}')
     options.add_experimental_option("prefs", {"download_restrictions": 3})
 
-    service = Service(executable_path=ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
+    #service = Service(executable_path=ChromeDriverManager().install())
+    #driver = webdriver.Chrome(service=service, options=options)
+    driver = webdriver.Chrome(options=options)
 
     driver.get(url)
 
