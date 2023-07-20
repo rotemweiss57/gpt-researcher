@@ -88,13 +88,14 @@ fi
 
 sudo ldconfig /usr/lib
 
-# Install Firefox
-sudo yum install -y Xvfb firefox
 
-# Install GeckoDriver
-GECKODRIVER_VERSION='v0.30.0'
-wget https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
-tar -xvzf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
-rm geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
-chmod +x geckodriver
-sudo mv geckodriver /usr/local/bin/
+cd /tmp/
+sudo wget https://chromedriver.storage.googleapis.com/80.0.3987.106/chromedriver_linux64.zip
+sudo unzip -o chromedriver_linux64.zip
+sudo mv -f chromedriver /usr/bin/chromedriver
+chromedriver --version
+
+sudo curl https://intoli.com/install-google-chrome.sh | bash
+sudo mv -f /usr/bin/google-chrome-stable /usr/bin/google-chrome
+google-chrome --version && which google-chrome
+
