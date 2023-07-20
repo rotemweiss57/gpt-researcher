@@ -91,10 +91,10 @@ sudo ldconfig /usr/lib
 cd /tmp/
 
 # Get latest stable version of ChromeDriver
-LATEST_CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
+#LATEST_CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
 
 if ! type chromedriver > /dev/null 2>&1; then
-    sudo wget "https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
+    sudo wget "https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip"
     sudo unzip chromedriver_linux64.zip
     sudo mv chromedriver /usr/bin/chromedriver
     sudo chmod +x /usr/bin/chromedriver
