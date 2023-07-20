@@ -90,7 +90,7 @@ sudo ldconfig /usr/lib
 
 
 cd /tmp/
-sudo wget https://chromedriver.storage.googleapis.com/80.0.3987.106/chromedriver_linux64.zip
+sudo wget https://chromedriver.storage.googleapis.com/115.0.5790.98/chromedriver_linux64.zip
 sudo unzip -o chromedriver_linux64.zip
 sudo mv -f chromedriver /usr/bin/chromedriver
 chromedriver --version
