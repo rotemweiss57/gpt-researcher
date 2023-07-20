@@ -90,20 +90,21 @@ sudo ldconfig /usr/lib
 
 cd /tmp/
 
+# Specify the desired ChromeDriver version
+DESIRED_CHROMEDRIVER_VERSION='114.0.5735.90'
 
-if ! type chromedriver > /dev/null 2>&1; then
-    sudo wget https://chromedriver.storage.googleapis.com/80.0.3987.106/chromedriver_linux64.zip
-    sudo unzip chromedriver_linux64.zip
-    sudo mv chromedriver /usr/bin/chromedriver
-    sudo chmod +x /usr/bin/chromedriver
-fi
+# Install ChromeDriver
+sudo wget "https://chromedriver.storage.googleapis.com/${DESIRED_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
+sudo unzip chromedriver_linux64.zip
+sudo mv chromedriver /usr/bin/chromedriver
+sudo chmod +x /usr/bin/chromedriver
 
+# Verify the installed ChromeDriver version
 chromedriver --version
 
-# Install latest stable version of Google Chrome
-if ! type google-chrome > /dev/null 2>&1; then
-    sudo curl https://intoli.com/install-google-chrome.sh | bash
-    sudo mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
-fi
+# Install Google Chrome
+sudo curl https://intoli.com/install-google-chrome.sh | bash
+sudo mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
 
+# Verify the installed Google Chrome version
 google-chrome --version && which google-chrome
