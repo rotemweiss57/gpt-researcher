@@ -92,21 +92,40 @@ cd /tmp/
 
 # Specify the desired ChromeDriver version
 DESIRED_CHROMEDRIVER_VERSION='114.0.5735.90'
+DESIRED_GOOGLE_CHROME_VERSION='114'
 
 # Install ChromeDriver
-sudo wget "https://chromedriver.storage.googleapis.com/${DESIRED_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
-sudo unzip chromedriver_linux64.zip
-sudo mv chromedriver /usr/bin/chromedriver
-sudo chmod +x /usr/bin/chromedriver
+echo "Installing ChromeDriver..."
+wget -N "https://chromedriver.storage.googleapis.com/${DESIRED_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -P ~/
+unzip ~/chromedriver_linux64.zip -d ~/
+rm ~/chromedriver_linux64.zip
+sudo mv -f ~/chromedriver /usr/bin/chromedriver
+sudo chown root:root /usr/bin/chromedriver
+sudo chmod 0755 /usr/bin/chromedriver
 
 # Verify the installed ChromeDriver version
-chromedriver --version
+echo "Verifying ChromeDriver installation..."
+if chromedriver --version | grep "${DESIRED_CHROMEDRIVER_VERSION}"; then
+    echo "ChromeDriver installed successfully."
+else
+    echo "ChromeDriver installation failed."
+    exit 1
+fi
 
-# Install Google Chrome version 114
+# Install Google Chrome
+echo "Installing Google Chrome..."
 if ! type google-chrome > /dev/null 2>&1; then
-    sudo curl https://intoli.com/install-google-chrome.sh | bash -s -- --version "114.0"
-    sudo mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
+    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+    echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
+    sudo apt-get update
+    sudo apt-get install -y google-chrome-stable
 fi
 
 # Verify the installed Google Chrome version
-google-chrome --version && which google-chrome
+echo "Verifying Google Chrome installation..."
+if google-chrome --version | grep "${DESIRED_GOOGLE_CHROME_VERSION}"; then
+    echo "Google Chrome installed successfully."
+else
+    echo "Google Chrome installation failed."
+    exit 1
+fi
