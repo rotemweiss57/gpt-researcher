@@ -89,20 +89,20 @@ fi
 sudo ldconfig /usr/lib
 
 
-# Download the package
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-
-# Install the package - this should handle all the dependencies. If not, please execute `sudo apt-get install -f`
-sudo dpkg -i google-chrome-stable_current_amd64.deb
+# Install Google Chrome
+sudo yum install -y https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
 
 # Verify the installation
 google-chrome --version && which google-chrome
+
+# Install unzip if it's not already installed
+sudo yum install -y unzip
 
 # Download the appropriate ChromeDriver version
 wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
 
 # Unzip the package
-unzip -o chromedriver_linux64.zip
+unzip chromedriver_linux64.zip
 
 # Move the executable to /usr/bin or any other directory in your $PATH
 sudo mv -f chromedriver /usr/bin/chromedriver
