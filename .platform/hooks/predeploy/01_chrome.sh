@@ -2,7 +2,7 @@
 
 # Download ChromeDriver
 cd /tmp
-wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/115.0.5790.98/linux64/chromedriver_linux64.zip || exit 1
+wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/115.0.5790.98/linux64/chromedriver-linux64.zip || exit 1
 unzip -o chromedriver_linux64.zip || exit 1
 
 # Move ChromeDriver to /usr/bin/
