@@ -89,13 +89,4 @@ fi
 sudo ldconfig /usr/lib
 
 
-cd /tmp/
-wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/115.0.5790.98/linux64/chromedriver-linux64.zip
-unzip -o chromedriver_linux64.zip
-sudo mv -f chromedriver /usr/bin/chromedriver
-chromedriver --version
-
-sudo curl https://intoli.com/install-google-chrome.sh | bash
-sudo mv -f /usr/bin/google-chrome-stable /usr/bin/google-chrome
-google-chrome --version && which google-chrome
 
