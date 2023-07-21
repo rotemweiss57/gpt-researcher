@@ -55,6 +55,7 @@ async def async_browse(url: str, question: str, websocket: WebSocket) -> str:
 
     try:
         driver, text = await loop.run_in_executor(executor, scrape_text_with_selenium, url)
+        print(text)
         await loop.run_in_executor(executor, add_header, driver)
         summary_text = await loop.run_in_executor(executor, summary.summarize_text, url, text, question, driver)
 
@@ -130,9 +131,6 @@ def scrape_text_with_selenium(self, url: str) -> tuple:
     options.add_experimental_option("prefs", {"download_restrictions": 3})
     service = Service(executable_path=chromedriver_path)
 
-    # Create the WebDriver
-    self.create_driver(options=options, service=service)
-    self.driver.get(url)
 
     # Print Chrome version
     print("Chrome version:", self.driver.capabilities["version"])
@@ -141,6 +139,11 @@ def scrape_text_with_selenium(self, url: str) -> tuple:
     with os.popen("chromedriver --version") as f:
         chromedriver_version = f.read().strip()
     print("ChromeDriver version:", chromedriver_version)
+
+    # Create the WebDriver
+    self.create_driver(options=options, service=service)
+    self.driver.get(url)
+
 
     WebDriverWait(self.driver, 10).until(
         EC.presence_of_element_located((By.TAG_NAME, "body"))
