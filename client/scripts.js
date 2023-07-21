@@ -44,6 +44,13 @@ const listenToSockEvents = () => {
             writeReport(data, converter);
         } else if (data.type === 'path') {
             updateDownloadLink(data);
+        } else if (data.type === 'email') {
+            const email = prompt('Please enter your email address and we will update you when you can access the website');
+            if (email) {
+                const emailData = JSON.stringify({type: 'email', email: email});
+                console.log("Sending email data:", emailData);
+                socket.send(emailData);
+            }
         }
     };
 
