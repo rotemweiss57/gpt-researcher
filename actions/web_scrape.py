@@ -1,11 +1,11 @@
 """Selenium web scraping module."""
 from __future__ import annotations
-
+import os
 import logging
 import asyncio
 from pathlib import Path
 from sys import platform
-from seleniumbase import Driver
+from seleniumbase import BaseCase
 from seleniumbase import config as sb_config
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
@@ -98,47 +98,60 @@ def browse_website(url: str, question: str) -> tuple[str, WebDriver]:
     return f"Answer gathered from website: {summary_text} \n \n Links: {links}", driver
 
 
-def scrape_text_with_selenium(url: str) -> tuple[WebDriver, str]:
-    """Scrape text from a website using selenium
+def scrape_text_with_selenium(self, url: str) -> tuple:
+    """Scrape text from a website using SeleniumBase
 
     Args:
-        url (str): The url of the website to scrape
+        url (str): The URL of the website to scrape
 
     Returns:
-        Tuple[WebDriver, str]: The webdriver and the text scraped from the website
+        Tuple[WebDriver, str]: The WebDriver and the text scraped from the website
     """
-    logging.getLogger("selenium").setLevel(logging.CRITICAL)
+    # Set the user agent for the test
+    sb_config.update({"user_agent": "Your User Agent"})
 
+    # Set the ChromeDriver executable path
+    chromedriver_path = "/usr/bin/chromedriver"
+
+    if not os.path.exists(chromedriver_path):
+        # Download the ChromeDriver if it doesn't exist
+        os.system(
+            "wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/115.0.5790.98/linux64/chromedriver-linux64.zip -O /tmp/chromedriver-linux64.zip"
+        )
+        os.system("unzip -o /tmp/chromedriver-linux64.zip -d /tmp/")
+        os.system(f"sudo mv -f /tmp/chromedriver /usr/bin/chromedriver")
+
+    # Chrome options and service configuration
     options = ChromeOptions()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")  # Overcomes limited resource problems
-    options.add_argument(f'user-agent={CFG.user_agent}')
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument(f"user-agent={sb_config.user_agent}")
     options.add_experimental_option("prefs", {"download_restrictions": 3})
+    service = Service(executable_path=chromedriver_path)
 
-    #service = Service(executable_path=ChromeDriverManager().install())
-    #driver = webdriver.Chrome(service=service, options=options)
-    driver = Driver(browser="chrome", headless=False)
+    # Create the WebDriver
+    self.create_driver(options=options, service=service)
+    self.driver.get(url)
 
-    driver.get(url)
-
-    WebDriverWait(driver, 10).until(
+    WebDriverWait(self.driver, 10).until(
         EC.presence_of_element_located((By.TAG_NAME, "body"))
     )
 
     # Get the HTML content directly from the browser's DOM
-    page_source = driver.execute_script("return document.body.outerHTML;")
+    page_source = self.driver.execute_script("return document.body.outerHTML;")
     soup = BeautifulSoup(page_source, "html.parser")
 
     for script in soup(["script", "style"]):
         script.extract()
 
-    text = get_text(soup)
+    text = self.get_text(soup)
 
     lines = (line.strip() for line in text.splitlines())
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     text = "\n".join(chunk for chunk in chunks if chunk)
-    return driver, text
+
+    return self.driver, text
 
 
 def get_text(soup):
