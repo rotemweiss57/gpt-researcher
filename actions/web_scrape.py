@@ -134,6 +134,14 @@ def scrape_text_with_selenium(self, url: str) -> tuple:
     self.create_driver(options=options, service=service)
     self.driver.get(url)
 
+    # Print Chrome version
+    print("Chrome version:", self.driver.capabilities["version"])
+
+    # Print ChromeDriver version
+    with os.popen("chromedriver --version") as f:
+        chromedriver_version = f.read().strip()
+    print("ChromeDriver version:", chromedriver_version)
+
     WebDriverWait(self.driver, 10).until(
         EC.presence_of_element_located((By.TAG_NAME, "body"))
     )
@@ -152,7 +160,6 @@ def scrape_text_with_selenium(self, url: str) -> tuple:
     text = "\n".join(chunk for chunk in chunks if chunk)
 
     return self.driver, text
-
 
 def get_text(soup):
     """Get the text from the soup
