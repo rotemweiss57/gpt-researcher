@@ -5,8 +5,6 @@ import logging
 import asyncio
 from pathlib import Path
 from sys import platform
-from seleniumbase import Driver
-from seleniumbase import config as sb_config
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager

@@ -18,4 +18,3 @@ fastapi
 python-multipart
 markdown
 pymongo
-seleniumbase
