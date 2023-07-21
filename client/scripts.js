@@ -34,26 +34,44 @@ const listenToSockEvents = () => {
     };
 
     // Log when a message is received from the server
-    socket.onmessage = (event) => {
-        console.log("Received data:", event.data);
+        socket.onmessage = (event) => {
+            console.log("Received data:", event.data);
 
-        const data = JSON.parse(event.data);
-        if (data.type === 'logs') {
-            addAgentResponse(data);
-        } else if (data.type === 'report') {
-            writeReport(data, converter);
-        } else if (data.type === 'path') {
-            updateDownloadLink(data);
-        } else if (data.type === 'email') {
-            const email = prompt('Please enter your email address and we will update you when you can access the website');
-            if (email) {
-                const emailData = JSON.stringify({type: 'email', email: email});
-                console.log("Sending email data:", emailData);
-                socket.send(emailData);
+            const data = JSON.parse(event.data);
+            if (data.type === 'logs') {
+                addAgentResponse(data);
+            } else if (data.type === 'report') {
+                writeReport(data, converter);
+            } else if (data.type === 'path') {
+                updateDownloadLink(data);
+            } else if (data.type === 'email') {
+                Swal.fire({
+                    title: 'High Volume of Requests',
+                    html: 'We are currently experiencing a high volume of requests. To better serve you, we kindly ask you to provide your email address. We will notify you as soon as you can access the site.',
+                    input: 'email',
+                    inputPlaceholder: 'Your email address',
+                    showCancelButton: true,
+                    confirmButtonText: 'Submit',
+                    showLoaderOnConfirm: true,
+                    preConfirm: (email) => {
+                        if (email) {
+                            const emailData = JSON.stringify({type: 'email', email: email});
+                            console.log("Sending email data:", emailData);
+                            socket.send(emailData);
+                        }
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: `Email Submitted`,
+                            text: 'We will update you when you can access the site.',
+                            icon: 'success'
+                        })
+                    }
+                });
             }
-        }
-    };
-
+        };
     // Log any errors
     socket.onerror = (error) => {
         console.log("WebSocket error:", error);
