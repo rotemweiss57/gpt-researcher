@@ -51,16 +51,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 report_type = json_data.get("report_type")
                 agent = json_data.get("agent")
                 api_key = json_data.get("api_key")
-                await websocket.send_json({"type": "logs",
-                                           "output": "Due to the high volume of requests, we are unable to process your request at this time. Please try again later."})
-                time.sleep(1)
-                await websocket.send_json({"type": "email",
-                                           "output": "Please enter your email address and we will update you when you can access the site"})
-                data = await websocket.receive_text()
-                json_data = json.loads(data)
-                email = json_data.get("email")
                 if task and report_type and agent:
-                    await manager.start_streaming(task, report_type, agent, websocket, api_key, email)
+                    await manager.start_streaming(task, report_type, agent, websocket, api_key)
                 else:
                     print("Error: not enough parameters provided.")
 

@@ -5,7 +5,7 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 
 
-def query2db(query, agent, report_type, start_time, email):
+def query2db(query, agent, report_type, start_time):
     # Connect to the MongoDB server
     usr = os.getenv('MONGO_USER')
     pwd = os.getenv('MONGO_PWD')
@@ -27,7 +27,6 @@ def query2db(query, agent, report_type, start_time, email):
         'total_time': None,
         'report_path': None,
         'status': 'started',
-        'email': email,
         'created': datetime.now()
     }
 
