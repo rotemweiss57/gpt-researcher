@@ -1,12 +1,11 @@
 """Selenium web scraping module."""
 from __future__ import annotations
-import os
+
 import logging
 import asyncio
 from pathlib import Path
 from sys import platform
-from seleniumbase import BaseCase
-from seleniumbase import config as sb_config
+
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
@@ -20,7 +19,6 @@ from selenium.webdriver.safari.options import Options as SafariOptions
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from fastapi import WebSocket
-
 
 import processing.text as summary
 
@@ -98,68 +96,69 @@ def browse_website(url: str, question: str) -> tuple[str, WebDriver]:
     return f"Answer gathered from website: {summary_text} \n \n Links: {links}", driver
 
 
-def scrape_text_with_selenium(self, url: str) -> tuple:
-    """Scrape text from a website using SeleniumBase
+def scrape_text_with_selenium(url: str) -> tuple[WebDriver, str]:
+    """Scrape text from a website using selenium
 
     Args:
-        url (str): The URL of the website to scrape
+        url (str): The url of the website to scrape
 
     Returns:
-        Tuple[WebDriver, str]: The WebDriver and the text scraped from the website
+        Tuple[WebDriver, str]: The webdriver and the text scraped from the website
     """
-    # Set the user agent for the test
-    sb_config.update({"user_agent": "Your User Agent"})
+    logging.getLogger("selenium").setLevel(logging.CRITICAL)
 
-    # Set the ChromeDriver executable path
-    chromedriver_path = "/usr/bin/chromedriver"
+    options_available = {
+        "chrome": ChromeOptions,
+        "safari": SafariOptions,
+        "firefox": FirefoxOptions,
+    }
 
-    if not os.path.exists(chromedriver_path):
-        # Download the ChromeDriver if it doesn't exist
-        os.system(
-            "wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/115.0.5790.98/linux64/chromedriver-linux64.zip -O /tmp/chromedriver-linux64.zip"
+    options = options_available[CFG.selenium_web_browser]()
+    options.add_argument(CFG.user_agent)
+    options.add_argument('--headless')
+
+    if CFG.selenium_web_browser == "firefox":
+        service = Service(executable_path=GeckoDriverManager().install())
+        driver = webdriver.Firefox(
+            service=service, options=options
         )
-        os.system("unzip -o /tmp/chromedriver-linux64.zip -d /tmp/")
-        os.system(f"sudo mv -f /tmp/chromedriver /usr/bin/chromedriver")
+    elif CFG.selenium_web_browser == "safari":
+        # Requires a bit more setup on the users end
+        # See https://developer.apple.com/documentation/webkit/testing_with_webdriver_in_safari
+        driver = webdriver.Safari(options=options)
+    else:
+        if platform == "linux" or platform == "linux2":
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--remote-debugging-port=9222")
+        options.add_argument("--no-sandbox")
+        options.add_experimental_option(
+            "prefs", {"download_restrictions": 3}
+        )
+        service = Service(executable_path=ChromeDriverManager().install())
+        driver = webdriver.Chrome(
+            service=service, options=options
+        )
+    driver.get(url)
 
-    # Chrome options and service configuration
-    options = ChromeOptions()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument(f"user-agent={sb_config.user_agent}")
-    options.add_experimental_option("prefs", {"download_restrictions": 3})
-    service = Service(executable_path=chromedriver_path)
-
-    # Create the WebDriver
-    self.create_driver(options=options, service=service)
-    self.driver.get(url)
-
-    # Print Chrome version
-    print("Chrome version:", self.driver.capabilities["version"])
-
-    # Print ChromeDriver version
-    with os.popen("chromedriver --version") as f:
-        chromedriver_version = f.read().strip()
-    print("ChromeDriver version:", chromedriver_version)
-
-    WebDriverWait(self.driver, 10).until(
+    WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.TAG_NAME, "body"))
     )
 
     # Get the HTML content directly from the browser's DOM
-    page_source = self.driver.execute_script("return document.body.outerHTML;")
+    page_source = driver.execute_script("return document.body.outerHTML;")
     soup = BeautifulSoup(page_source, "html.parser")
 
     for script in soup(["script", "style"]):
         script.extract()
 
-    text = self.get_text(soup)
+    # text = soup.get_text()
+    text = get_text(soup)
 
     lines = (line.strip() for line in text.splitlines())
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     text = "\n".join(chunk for chunk in chunks if chunk)
+    return driver, text
 
-    return self.driver, text
 
 def get_text(soup):
     """Get the text from the soup
