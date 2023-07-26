@@ -34,54 +34,18 @@ const listenToSockEvents = () => {
     };
 
     // Log when a message is received from the server
-socket.onmessage = (event) => {
-    console.log("Received data:", event.data);
+    socket.onmessage = (event) => {
+        console.log("Received data:", event.data);
 
-    const data = JSON.parse(event.data);
-    if (data.type === 'logs') {
-        addAgentResponse(data);
-    } else if (data.type === 'report') {
-        writeReport(data, converter);
-    } else if (data.type === 'path') {
-        updateDownloadLink(data);
-    } else if (data.type === 'email') {
-        Swal.fire({
-            title: 'High Volume of Requests',
-            html: 'We are currently experiencing a high volume of requests. To better serve you, we kindly ask you to provide your email address. We will notify you as soon as you can access the site.',
-            input: 'email',
-            inputPlaceholder: 'Your email address',
-            showCancelButton: true,
-            confirmButtonText: 'Submit',
-            showLoaderOnConfirm: true,
-            preConfirm: (email) => {
-                if (email) {
-                    const emailData = JSON.stringify({type: 'email', email: email});
-                    console.log("Sending email data:", emailData);
-                    socket.send(emailData);
-                }
-            },
-            allowOutsideClick: () => !Swal.isLoading()
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Email Submitted',
-                    html: 'We will update you when you can access the site. <br /> In the meantime, check out our GitHub and join our Discord!',
-                    icon: 'success',
-                    showCancelButton: true,
-                    cancelButtonText: `Close`,
-                    confirmButtonText: 'Done',
-                    footer: `
-                        <a href="https://github.com/assafelovic/gpt-researcher" target="_blank">
-                            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" style="width: 20px;"/> GitHub
-                        </a>
-                        <a href="https://discord.com/invite/2pFkc83fRq" target="_blank" style="margin-left: 20px;">
-                            <img src="https://w7.pngwing.com/pngs/159/401/png-transparent-discord-android-computer-icons-discord-video-game-smiley-online-chat-thumbnail.png" alt="Discord" style="width: 20px;"/> Discord
-                        </a>`,
-                })
-            }
-        });
-    }
-};
+        const data = JSON.parse(event.data);
+        if (data.type === 'logs') {
+            addAgentResponse(data);
+        } else if (data.type === 'report') {
+            writeReport(data, converter);
+        } else if (data.type === 'path') {
+            updateDownloadLink(data);
+        }
+    };
 
     // Log any errors
     socket.onerror = (error) => {
