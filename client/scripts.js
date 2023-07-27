@@ -11,6 +11,7 @@ const GPTResearcher = (() => {
     const listenToSockEvents = () => {
       const { protocol, host, pathname } = window.location;
       const ws_uri = 'wss://app.tavily.com/ws'
+        //const ws_uri = `${protocol === 'https:' ? 'wss:' : 'ws:'}//${host}${pathname}ws`;
       const converter = new showdown.Converter();
       const socket = new WebSocket(ws_uri);
 

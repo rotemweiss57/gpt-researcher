@@ -35,6 +35,7 @@ class ResearchAgent:
         self.directory_name = ''.join(c for c in question if c.isascii() and c not in string.punctuation)[:100]
         self.dir_path = os.path.dirname(f"./outputs/{self.directory_name}/")
         self.websocket = websocket
+
     async def summarize(self, text, topic):
         """ Summarizes the given text for the given topic.
         Args: text (str): The text to summarize
