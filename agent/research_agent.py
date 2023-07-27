@@ -16,11 +16,12 @@ from agent import prompts
 import os
 import string
 
+
 CFG = Config()
 
 
 class ResearchAgent:
-    def __init__(self, question, agent, websocket):
+    def __init__(self, question, agent, agent_role_prompt, websocket):
         """ Initializes the research assistant with the given question.
         Args: question (str): The question to research
         Returns: None
@@ -28,6 +29,7 @@ class ResearchAgent:
 
         self.question = question
         self.agent = agent
+        self.agent_role_prompt = agent_role_prompt
         self.visited_urls = set()
         self.research_summary = ""
         self.directory_name = ''.join(c for c in question if c.isascii() and c not in string.punctuation)[:100]
@@ -67,7 +69,7 @@ class ResearchAgent:
     async def call_agent(self, action, stream=False, websocket=None):
         messages = [{
             "role": "system",
-            "content": prompts.generate_agent_role_prompt(self.agent),
+            "content": self.agent_role_prompt if self.agent_role_prompt else prompts.generate_agent_role_prompt(self.agent)
         }, {
             "role": "user",
             "content": action,
@@ -85,14 +87,10 @@ class ResearchAgent:
         Args: None
         Returns: list[str]: The search queries for the given question
         """
-        try:
-            result = await self.call_agent(prompts.generate_search_queries_prompt(self.question))
-            await self.websocket.send_json(
-                {"type": "logs", "output": f"🧠 I will conduct my research based on the following queries: {result}..."})
-            result = json.loads(result)
-            return result, None
-        except Exception as e:
-            return "Error", e
+        result = await self.call_agent(prompts.generate_search_queries_prompt(self.question))
+        print(result)
+        await self.websocket.send_json({"type": "logs", "output": f"🧠 I will conduct my research based on the following queries: {result}..."})
+        return json.loads(result)
 
     async def async_search(self, query):
         """ Runs the async search for the given query.
@@ -103,8 +101,7 @@ class ResearchAgent:
         new_search_urls = self.get_new_urls([url.get("href") for url in search_results])
 
         await self.websocket.send_json(
-            {"type": "logs",
-             "output": f"🌐 Browsing the following sites for relevant information: {new_search_urls}..."})
+            {"type": "logs", "output": f"🌐 Browsing the following sites for relevant information: {new_search_urls}..."})
 
         # Create a list to hold the coroutine objects
         tasks = [async_browse(url, query, self.websocket) for url in await new_search_urls]
@@ -135,24 +132,19 @@ class ResearchAgent:
         Returns: str: The research for the given question
         """
 
-        # self.research_summary = read_txt_files(self.dir_path) if os.path.isdir(self.dir_path) else ""
+        self.research_summary = read_txt_files(self.dir_path) if os.path.isdir(self.dir_path) else ""
 
-        # if not self.research_summary:
-        try:
-            search_queries, e = await self.create_search_queries()
-            if search_queries == "Error":
-                return "Error", f"{e}"
+        if not self.research_summary:
+            search_queries = await self.create_search_queries()
             for query in search_queries:
                 research_result = await self.run_search_summary(query)
                 self.research_summary += f"{research_result}\n\n"
 
-        except Exception as e:
-            return "Error", f"{e}"
-
         await self.websocket.send_json(
             {"type": "logs", "output": f"Total research words: {len(self.research_summary.split(' '))}"})
 
-        return self.research_summary, None
+        return self.research_summary
+
 
     async def create_concepts(self):
         """ Creates the concepts for the given question.
@@ -161,8 +153,7 @@ class ResearchAgent:
         """
         result = self.call_agent(prompts.generate_concepts_prompt(self.question, self.research_summary))
 
-        await self.websocket.send_json(
-            {"type": "logs", "output": f"I will research based on the following concepts: {result}\n"})
+        await self.websocket.send_json({"type": "logs", "output": f"I will research based on the following concepts: {result}\n"})
         return json.loads(result)
 
     async def write_report(self, report_type, websocket):
@@ -176,9 +167,9 @@ class ResearchAgent:
         answer = await self.call_agent(report_type_func(self.question, self.research_summary), stream=True,
                                        websocket=websocket)
 
-        encoded_path, path = await write_md_to_pdf(report_type, self.directory_name, await answer)
+        path = await write_md_to_pdf(report_type, self.directory_name, await answer)
 
-        return answer, encoded_path, path
+        return answer, path
 
     async def write_lessons(self):
         """ Writes lessons on essential concepts of the research.

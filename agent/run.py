@@ -37,18 +37,18 @@ class WebSocketManager:
         del self.sender_tasks[websocket]
         del self.message_queues[websocket]
 
-    async def start_streaming(self, task, report_type, agent, websocket, api_key):
-        report, path = await run_agent(task, report_type, agent, websocket, api_key)
+    async def start_streaming(self, task, report_type, agent, websocket,agent_role_prompt, api_key):
+        report, path = await run_agent(task, report_type, agent, websocket,agent_role_prompt, api_key)
         return report, path
 
 
-async def run_agent(task, report_type, agent, websocket, api_key):
+async def run_agent(task, report_type, agent, websocket,agent_role_prompt, api_key):
     openai.api_key = api_key
 
     start_time = datetime.now()
     print(f"Start time: {start_time}")
     document_id = query2db(task, agent, report_type, start_time)
-    assistant = ResearchAgent(task, agent, websocket)
+    assistant = ResearchAgent(task, agent, agent_role_prompt, websocket)
     result, error = await assistant.conduct_research()
     if result == "Error":
         await websocket.send_json({"type": "logs", "output": error})
