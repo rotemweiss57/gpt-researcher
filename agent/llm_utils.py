@@ -13,7 +13,7 @@ from config import Config
 
 CFG = Config()
 
-openai.api_key = CFG.openai_api_key
+#openai.api_key = CFG.openai_api_key
 
 from typing import Optional
 import logging
