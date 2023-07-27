@@ -107,38 +107,14 @@ def scrape_text_with_selenium(url: str) -> tuple[WebDriver, str]:
     """
     logging.getLogger("selenium").setLevel(logging.CRITICAL)
 
-    options_available = {
-        "chrome": ChromeOptions,
-        "safari": SafariOptions,
-        "firefox": FirefoxOptions,
-    }
+    options = ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")  # Overcomes limited resource problems
+    options.add_argument(f'user-agent={CFG.user_agent}')
+    options.add_experimental_option("prefs", {"download_restrictions": 3})
 
-    options = options_available[CFG.selenium_web_browser]()
-    options.add_argument(CFG.user_agent)
-    options.add_argument('--headless')
-
-    if CFG.selenium_web_browser == "firefox":
-        service = Service(executable_path=GeckoDriverManager().install())
-        driver = webdriver.Firefox(
-            service=service, options=options
-        )
-    elif CFG.selenium_web_browser == "safari":
-        # Requires a bit more setup on the users end
-        # See https://developer.apple.com/documentation/webkit/testing_with_webdriver_in_safari
-        driver = webdriver.Safari(options=options)
-    else:
-        if platform == "linux" or platform == "linux2":
-            options.add_argument("--disable-dev-shm-usage")
-            options.add_argument("--remote-debugging-port=9222")
-        options.add_argument("--no-sandbox")
-        options.add_experimental_option(
-            "prefs", {"download_restrictions": 3}
-        )
-        #service = Service(executable_path=ChromeDriverManager().install())
-        #driver = webdriver.Chrome(
-        #    service=service, options=options
-        #)
-        driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(options=options)
     driver.get(url)
 
     WebDriverWait(driver, 10).until(
